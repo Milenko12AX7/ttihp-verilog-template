@@ -1,17 +1,17 @@
 # Tiny Tapeout project information
 project:
-  title:        "Lavadora 3 sensores"
-  author:       "Milenko12AX7"
-  discord:      ""
-  description:  "FSM de una lavadora con deteccion de peso, nivel de agua y temporizador"
-  language:     "Verilog"
-  clock_hz:     1
+  title:        "Ciclo lavadora 3bit"      # Project title
+  author:       "Milenko12AX7"      # Your name
+  discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
+  description:  "Verifica avance de ciclo de Lavadora"      # One line description of what your project does
+  language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
+  clock_hz:     0       # Clock frequency in Hz (or 0 if not applicable)
 
   # How many tiles your design occupies? A single tile is about 167x108 uM.
-  tiles: "1x1"
+  tiles: "1x1"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
 
   # Your top module name must start with "tt_um_". Make it unique by including your github username:
-  top_module:  "tt_um_Milenko12AX7_lavadora"
+  top_module:  "tt_um_Milenko12AX7_ciclo_lavadora_3bit"
 
   # List your project's source files here.
   # Source files must be in ./src and you must list each source file separately, one per line.
@@ -20,12 +20,12 @@ project:
     - "project.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
-# This section is for the datasheet/website. Use descriptive names.
+# This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
 pinout:
   # Inputs
-  ui[0]: "P_SENSOR"
-  ui[1]: "A_SENSOR"
-  ui[2]: ""
+  ui[0]: "Q0"
+  ui[1]: "Q1"
+  ui[2]: "Q2"
   ui[3]: ""
   ui[4]: ""
   ui[5]: ""
@@ -33,11 +33,11 @@ pinout:
   ui[7]: ""
 
   # Outputs
-  uo[0]: "STATE_BIT0"
-  uo[1]: "STATE_BIT1"
-  uo[2]: "STATE_BIT2"
-  uo[3]: "STATE_BIT3"
-  uo[4]: "T_DONE"
+  uo[0]: ""
+  uo[1]: ""
+  uo[2]: ""
+  uo[3]: ""
+  uo[4]: ""
   uo[5]: ""
   uo[6]: ""
   uo[7]: ""

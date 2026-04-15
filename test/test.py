@@ -35,4 +35,4 @@ module tb ();
       .rst_n  (rst_n)     // not reset
   );
 
-endmodule ese es el tb.v ojo que el nombre es ciclo_lavadora_3bit
+endmodule 

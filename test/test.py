@@ -1,38 +1,76 @@
-`default_nettype none
-`timescale 1ns / 1ps
+# SPDX-FileCopyrightText: © 2024 Tiny Tapeout
+# SPDX-License-Identifier: Apache-2.0
 
-/* This testbench just instantiates the module and makes some convenient wires
-   that can be driven / tested by the cocotb test.py.
-*/
-module tb ();
+import cocotb
+from cocotb.clock import Clock
+from cocotb.triggers import ClockCycles
 
-  // Dump the signals to a FST file. You can view it with gtkwave or surfer.
-  initial begin
-    $dumpfile("tb.fst");
-    $dumpvars(0, tb);
-    #1;
-  end
 
-  // Wire up the inputs and outputs:
-  reg clk;
-  reg rst_n;
-  reg ena;
-  reg [7:0] ui_in;
-  reg [7:0] uio_in;
-  wire [7:0] uo_out;
-  wire [7:0] uio_out;
-  wire [7:0] uio_oe;
+def get_state(dut):
+    return int(dut.uo_out.value) & 0xF
 
-  // Replace tt_um_example with your module name:
-  tt_um_Milenko12AX7_ciclo_lavadora_4bit (
-      .ui_in  (ui_in),    // Dedicated inputs
-      .uo_out (uo_out),   // Dedicated outputs
-      .uio_in (uio_in),   // IOs: Input path
-      .uio_out(uio_out),  // IOs: Output path
-      .uio_oe (uio_oe),   // IOs: Enable path (active high: 0=input, 1=output)
-      .ena    (ena),      // enable - goes high when design is selected
-      .clk    (clk),      // clock
-      .rst_n  (rst_n)     // not reset
-  );
 
-endmodule 
+def get_timer_done(dut):
+    return (int(dut.uo_out.value) >> 4) & 0x1
+
+
+@cocotb.test()
+async def test_project(dut):
+    clock = Clock(dut.clk, 10, unit="us")
+    cocotb.start_soon(clock.start())
+
+    dut.ena.value = 1
+    dut.ui_in.value = 0
+    dut.uio_in.value = 0
+    dut.rst_n.value = 0
+
+    await ClockCycles(dut.clk, 2)
+    assert get_state(dut) == 0b0000
+
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+
+    dut.ui_in.value = 0b00000001  # P=1, A=0
+    await ClockCycles(dut.clk, 2)
+    assert get_state(dut) == 0b0000
+
+    dut.ui_in.value = 0b00000000  # P=0, A=0
+    await ClockCycles(dut.clk, 1)
+    assert get_state(dut) == 0b0001
+
+    await ClockCycles(dut.clk, 1)
+    assert get_state(dut) == 0b0001
+
+    dut.ui_in.value = 0b00000010  # P=0, A=1
+    await ClockCycles(dut.clk, 1)
+    assert get_state(dut) == 0b0010
+
+    await ClockCycles(dut.clk, 19)
+    assert get_timer_done(dut) == 1
+    await ClockCycles(dut.clk, 1)
+    assert get_state(dut) == 0b0011
+
+    dut.ui_in.value = 0b00000000  # A=0
+    await ClockCycles(dut.clk, 1)
+    assert get_state(dut) == 0b0100
+
+    dut.ui_in.value = 0b00000010  # A=1
+    await ClockCycles(dut.clk, 1)
+    assert get_state(dut) == 0b0101
+
+    await ClockCycles(dut.clk, 19)
+    assert get_timer_done(dut) == 1
+    await ClockCycles(dut.clk, 1)
+    assert get_state(dut) == 0b0110
+
+    dut.ui_in.value = 0b00000000  # A=0
+    await ClockCycles(dut.clk, 1)
+    assert get_state(dut) == 0b0111
+
+    await ClockCycles(dut.clk, 19)
+    assert get_timer_done(dut) == 1
+    await ClockCycles(dut.clk, 1)
+    assert get_state(dut) == 0b1000
+
+    await ClockCycles(dut.clk, 1)
+    assert get_state(dut) == 0b0000
